@@ -7,7 +7,7 @@ const dotenv = require('dotenv');
 process.on('uncaughtException', (err) => {
   // uncaught exceptions using an event listener called uncaughtException.
   console.log('UNCAUGHT EXCEPTION!💥Shutting down...');
-  console.log(err.name, err.message);
+  // console.log(err.name, err.message);
   process.exit(1); //compulsory to exit bcz to fix unclean state the process need to terminate
   // place this error handler before the execution of other code to ensure errors are caught properly. So place at top.
 });
@@ -42,7 +42,7 @@ const server = app.listen(port, () => {
 // When dealing with Node.js applications, unhandled promise rejections can occur due to errors happening outside the Express application's primary error-handling middleware. This can include issues like failing database connections, such as problems encountered when connecting to a MongoDB database.
 // process.on('unhandledRejection') refers to setting up an event listener for the 'unhandledRejection' event in the Node.js process object. This event is emitted when a Promise is rejected
 process.on('unhandledRejection', (err) => {
-  console.log(err.name, err.message);
+  // console.log(err.name, err.message);
   console.log('UNHANDLED REJECTION!💥Shutting down...');
   server.close(() => {
     // process of closing the server, allowing it time to finish handling pending requests before shutting down.

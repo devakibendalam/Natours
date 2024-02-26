@@ -4,7 +4,7 @@ import { showAlert } from './alerts';
 
 // Define an asynchronous function 'login' that takes 'email' and 'password' as parameters
 export const login = async (email, password) => {
-  console.log(email, password);
+  // console.log(email, password);
   try {
     // Axios is a popular JavaScript library used for making HTTP requests from browsers and Node.js environments.
     // The axios function is asynchronous and Accepts a configuration object as an argument with various properties such as method, url, data, params, headers, etc and Returns a promise that resolves to a response object.
@@ -12,13 +12,13 @@ export const login = async (email, password) => {
     // To make a POST request using Axios to a local API endpoint for user login
     const res = await axios({
       method: 'POST',
-      url: 'http://localhost:3000/api/v1/users/login',
+      url: '/api/v1/users/login',
       data: {
         email,
         password,
       },
     });
-    console.log(res);
+    // console.log(res);
 
     if (res.data.status === 'success') {
       showAlert('success', 'Logged in successfully!');
@@ -36,7 +36,7 @@ export const logout = async () => {
   try {
     const res = await axios({
       method: 'GET',
-      url: 'http://localhost:3000/api/v1/users/logout',
+      url: '/api/v1/users/logout',
     });
 
     // If successful, the page is reloaded to reflect the logout.
@@ -45,7 +45,7 @@ export const logout = async () => {
     // Reloading the page triggers the server to recognize the new cookie without a token, effectively logging the user out.
     // This code forces a reload of the current page from the server, ignoring any cached data. This ensures the user menu is updated with the latest information, even if it was previously cached.
   } catch (err) {
-    console.log(err.response);
+    // console.log(err.response);
     showAlert('error', 'Error logging out! Try again.');
   }
 };

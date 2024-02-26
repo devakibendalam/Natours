@@ -85,7 +85,7 @@ reviewSchema.statics.calcAverageRatings = async function (tourId) {
       },
     },
   ]);
-  console.log(stats); //returns stats as an array that contains tourid at 0 index
+  // console.log(stats); //returns stats as an array that contains tourid at 0 index
 
   if (stats.length > 0) {
     // Update the Tour model with the aggregated statistics

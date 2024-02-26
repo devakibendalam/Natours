@@ -8,6 +8,7 @@ const mongoSanitize = require('express-mongo-sanitize');
 const xss = require('xss-clean');
 const hpp = require('hpp');
 const cookieParser = require('cookie-parser');
+const compression = require('compression');
 
 const AppError = require('./utils/appError');
 const globalErrorHandler = require('./controllers/errorController');
@@ -45,83 +46,6 @@ app.use(express.static(path.join(__dirname, 'public'))); //Once this middleware 
 // 'Helmet' is a widely used npm package for setting essential security headers.
 // Place 'helmet' early in the middleware stack for proper header setup(add begining).
 app.use(helmet()); // app.use takes function as a parameter not function call but helemt() function call returns a middleware function.
-// app.use(
-//   helmet.contentSecurityPolicy({
-//     directives: {
-//       defaultSrc: ["'self'", 'blob:', 'https://*.mapbox.com'],
-//       scriptSrc: [
-//         "'self'",
-//         'https://*.mapbox.com',
-//         "'unsafe-inline'",
-//         'blob:',
-//         'https://cdnjs.cloudflare.com',
-//       ],
-//     },
-//   }),
-// );
-
-// app.use(
-//   helmet.contentSecurityPolicy({
-//     directives: {
-//       defaultSrc: ["'self'", "blob:", "https://*.mapbox.com"],
-//       scriptSrc: [
-//         "'self'",
-//         "https://*.mapbox.com",
-//         "'unsafe-inline'",
-//         "blob:",
-//         "https://cdnjs.cloudflare.com",
-//       ],
-//     },
-//   })
-// );
-
-// Set security HTTP Headers
-// app.use(
-//   helmet({
-//     crossOriginEmbedderPolicy: false,
-//   })
-// );
-
-// // Further HELMET configuration for Security Policy (CSP)
-// const scriptSrcUrls = [
-//   "https://api.tiles.mapbox.com/",
-//   "https://api.mapbox.com/",
-//   "https://*.cloudflare.com",
-//   "https://js.stripe.com/v3/",
-//   "https://checkout.stripe.com",
-// ];
-// const styleSrcUrls = [
-//   "https://api.mapbox.com/",
-//   "https://api.tiles.mapbox.com/",
-//   "https://fonts.googleapis.com/",
-//   "https://www.myfonts.com/fonts/radomir-tinkov/gilroy/*",
-//   " checkout.stripe.com",
-// ];
-// const connectSrcUrls = [
-//   "https://*.mapbox.com/",
-//   "https://*.cloudflare.com",
-//   "http://127.0.0.1:3000",
-//   "http://127.0.0.1:52191",
-//   "*.stripe.com",
-// ];
-
-// const fontSrcUrls = ["fonts.googleapis.com", "fonts.gstatic.com"];
-
-// app.use(
-//   helmet.contentSecurityPolicy({
-//     directives: {
-//       defaultSrc: [],
-//       connectSrc: ["'self'", ...connectSrcUrls],
-//       scriptSrc: ["'self'", ...scriptSrcUrls],
-//       workerSrc: ["'self'", "blob:"],
-//       styleSrc: ["'self'", "'unsafe-inline'", ...styleSrcUrls],
-//       objectSrc: [],
-//       imgSrc: ["'self'", "blob:", "data:"],
-//       fontSrc: ["'self'", ...fontSrcUrls],
-//       frameSrc: ["*.stripe.com", "*.stripe.network"],
-//     },
-//   })
-// );
 
 // Development logging
 //Morgan helps view request data in the console, making development easier.
@@ -188,11 +112,14 @@ app.use(
   }),
 );
 
+// Compression package is used to compress responses, especially text responses, before sending them to clients. . This middleware will compress all text sent to clients, improving performance.
+app.use(compression());
+
 // Test middleware
 app.use((req, res, next) => {
   req.requestTime = new Date().toISOString();
   // console.log(req.headers);
-  console.log(req.cookies);
+  // console.log(req.cookies);
   next();
 }); //to add a requestTime property to the req object, showing the current time in ISO string format.
 // Middleware Execution Order:

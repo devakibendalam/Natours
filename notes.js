@@ -1,3 +1,17 @@
+// …or create a new repository on the command line
+// echo "# Natours" >> README.md
+// git init
+// git add README.md
+// git commit -m "first commit"
+// …or push an existing repository from the command line
+// git remote add origin https://github.com/devakibendalam/Natours.git
+// git branch -M main
+// git push -u origin main
+
+// git add readme.md
+// git commit -m "Added a readme"
+// git push origin master
+
 // HEROKU platform works very colselywith git.
 // Git and GitHub Introduction:
 // Purpose: Git is a version control software that helps manage code changes over time.
@@ -38,18 +52,32 @@
 // Branches are essential for more complex collaborative workflows.
 
 // Example Workflow:
+
 // Initialize Git Repository: git init
-
 // Create .gitignore: Create a file named .gitignore and add entries like node_modules/ and *.env.
-
 // Staging and Committing: Use git add -A to stage all changes.
-
 // Commit changes with git commit -m "Initial commit".
-
 // Viewing Changes: Use git status to check modified files. Use git log to view commit history.
-
 // Editing and Committing Again: Make changes to a file (e.g., app.js).
 // Stage and commit changes again with appropriate messages.
-
 // Branch Information:
 // git branch shows the current branch (master in this case).
+
+// 221 - Pushing to GitHub:
+// pushing code to GitHub, specifically to a remote branch. So that  create new repository on GitHub(initializing the repository without a README file).
+// Connecting Local and Remote Repositories:
+
+// Connect the local repository with the remote repository on GitHub.
+// git remote add origin https://github.com/devakibendalam/Natours.git  -> this command used to add a remote branch, typically named 'origin.'
+
+// Pushing Code to GitHub using  the  command -> git push origin master
+// the pull operation, which is useful when working on multiple computers.
+// Modifying and committing changes locally involves Git commands like git add, git commit, and git push.
+
+// Creating a README File
+// Create a README file in the project directory (e.g., readme.md).
+// Use Markdown syntax for formatting.
+// Add a title, description, and technologies used.
+// git add readme.md
+// git commit -m "Added a readme"
+// git push origin master

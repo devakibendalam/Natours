@@ -71,7 +71,7 @@ exports.signup = catchAsync(async (req, res, next) => {
   // Sending Welcome Emails:
   //http://localhost:3000/me
   const url = `${req.protocol}://${req.get('host')}/me`;
-  console.log(url);
+  // console.log(url);
   await new Email(newUser, url).sendWelcome();
 
   createSendToken(newUser, 201, res);
@@ -138,7 +138,7 @@ exports.protect = catchAsync(async (req, res, next) => {
     // authenticate users based on tokens sent via cookies.
     token = req.cookies.jwt;
   }
-  console.log(token);
+  // console.log(token);
   if (!token) {
     return next(
       new AppError('You are not logged in! Please log in to get access!', 401),
@@ -204,7 +204,7 @@ exports.isLoggedIn = async (req, res, next) => {
       //   req.locals = req.locals || {};
       //req.locals is properly initialized before attempting to set properties on it. If req.locals is undefined or null, trying to set req.locals.user will result in this error.
       res.locals.user = currentUser; // Stores the user's information in response.locals.user to make it accessible in Pug templates to conditionally render UI components based on the user's login status.
-      console.log(res.locals.user);
+      // console.log(res.locals.user);
       return next();
     } catch (err) {
       // Fixing JSON Web Token Error at logout implementation:
