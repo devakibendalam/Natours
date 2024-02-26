@@ -1,0 +1,72 @@
+extends base
+
+mixin navItem(link, text, icon, active)
+  li(class=`${active ? 'side-nav--active' : ''}`)
+    a(href=`${link}`)
+      svg
+        use(xlink:href=`img/icons.svg#icon-${icon}`)
+      | #{text}
+
+block content
+  main.main
+    .user-view
+      nav.user-view__menu
+        ul.side-nav
+          +navItem('#', 'Settings', 'settings', true)
+          +navItem('/my-tours', 'My bookings', 'briefcase')
+          +navItem('#', 'My reviews', 'star')
+          +navItem('#', 'Billing', 'credit-card')
+
+        - if (user.role === 'admin')
+          .admin-nav
+            h5.admin-nav__heading Admin
+            ul.side-nav
+              +navItem('#', 'Manage tours', 'map')
+              +navItem('#', 'Manage users', 'users')
+              +navItem('#', 'Manage reviews', 'star')
+              +navItem('#', 'Manage bookings', 'briefcase')
+
+      .user-view__content
+        .user-view__form-container
+          h2.heading-secondary.ma-bt-md Your account settings
+          
+          //- Updating userdata WITHOUT API
+          //- form.form.form-user-data(action='/submit-user-data' method='POST' enctype='multipart/form-data')
+           //- defines an HTML form that automatically submits user data to the '/submit-user-data' endpoint using the POST method. This eliminates the need for JavaScript for form submission. The action attribute specifies the endpoint, and the method attribute specifies the submission type (POST in this case). This configuration must be applied directly to the form element we intend to submit.
+           //- There are also different ways in which the data is actually sent, but the default one is called URL encoded, and so that is we are using here. This encodes all the data that we are submitting in the URL, a bit like a query string. This here is the first step in making this method work, and the second one is to specify the name properties on the fields that we actually want to send.
+           // Additionally, the `enctype` attribute is set to 'multipart/form-data'. To send a file using this form without an API, the `enctype` attribute must be set to 'multipart/form-data'. This is because the `multipart/form-data` format is specifically designed for sending files to the server. Additionally, the Multer middleware is required to handle this type of form data. The name "Multer" comes from the fact that it handles multi-part form data. If we are using the form with an API, we do not need to specify the `enctype` attribute. However, we will need to configure the API to handle file uploads using a method like Multer. In summary, the `enctype` attribute is only necessary if we are sending a file without an API. For API usage, file upload handling is typically handled programmatically.
+          
+          //- WITH API
+          form.form.form-user-data
+            .form__group
+              label.form__label(for='name') Name
+              input#name.form__input(type='text', value=`${user.name}`, required, name='name')
+              // Here name='name' will be the name of this field, and the body that our application receives. So when we submit the form the body that we will receive will only have the name and the email, because these are the only two fields which actually have a name attribute.
+            .form__group.ma-bt-md
+              label.form__label(for='email') Email address
+              input#email.form__input(type='email', value=`${user.email}`, required, name='email')
+            .form__group.form__photo-upload
+              img.form__user-photo(src=`/img/users/${user.photo}`, alt='User photo')
+              input.form__upload(type='file', accept='image/*', id='photo', name='photo')
+               //- This input element is designated for file uploads. The type is set to 'file', which indicates it's for selecting files. The 'accept' attribute restricts file selection to only image files (those with MIME types starting with 'image/*'). The ID is set to 'photo', and the name attribute is also set to 'photo'.
+              label(for='photo') Choose new photo
+               //- This label is associated with the input element above. When clicked, it activates the input element with the ID specified in the 'for' attribute (in this case, 'photo'). This allows users to select a file by clicking on the label, which triggers the file selection dialog.
+            .form__group.right
+              button.btn.btn--small.btn--green Save settings
+              
+        .line &nbsp;
+        
+        .user-view__form-container
+          h2.heading-secondary.ma-bt-md Password change
+          form.form.form-user-password
+            .form__group
+              label.form__label(for='password-current') Current password
+              input#password-current.form__input(type='password', placeholder='••••••••', required, minlength='8')
+            .form__group
+              label.form__label(for='password') New password
+              input#password.form__input(type='password', placeholder='••••••••', required, minlength='8')
+            .form__group.ma-bt-lg
+              label.form__label(for='password-confirm') Confirm password
+              input#password-confirm.form__input(type='password', placeholder='••••••••', required, minlength='8')
+            .form__group.right
+              button.btn.btn--small.btn--green.btn--save-password Save password

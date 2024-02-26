@@ -1,0 +1,100 @@
+extends base
+include _reviewCard
+
+//- When extending a block from a parent template to a child template, the child template content usually replaces the parent block content. However, "block append" or "block prepend" commands help add content to a block without erasing the existing content. For instance, using "block append head" means adding content to the "head" block without removing what's already there; it appends the content at the end. 
+ //-  script(src='/js/mapbox.js') add this at end because need to load all the code 
+block append head
+   script(src='https://api.mapbox.com/mapbox-gl-js/v2.9.1/mapbox-gl.js')
+   link(href='https://api.mapbox.com/mapbox-gl-js/v2.9.1/mapbox-gl.css' rel='stylesheet')
+    //-  script(src='https://js.stripe.com/v3/')
+
+//- mixin takes arguments and works bit like a function in pug. mixins are basically reusable pieces of code.
+mixin overviewBox(label, text, icon)
+  .overview-box__detail
+    svg.overview-box__icon
+      use(xlink:href=`/img/icons.svg#icon-${icon}`)
+    span.overview-box__label= label
+    span.overview-box__text= text
+
+block content
+  section.section-header
+    .header__hero
+      .header__hero-overlay &nbsp;
+      img.header__hero-img(src=`/img/tours/${tour.imageCover}`, alt=`${tour.name}`)
+
+    .heading-box
+      h1.heading-primary
+        span= `${tour.name} tour`
+      .heading-box__group
+        .heading-box__detail
+          svg.heading-box__icon
+            use(xlink:href='/img/icons.svg#icon-clock')
+          span.heading-box__text= `${tour.duration} days`
+        .heading-box__detail
+          svg.heading-box__icon
+            use(xlink:href='/img/icons.svg#icon-map-pin')
+          span.heading-box__text= tour.startLocation.description
+
+  section.section-description
+    .overview-box
+      div
+        .overview-box__group
+          h2.heading-secondary.ma-bt-lg Quick facts
+
+          - const date = new Date(tour.startDates[0]).toLocaleString('en-us', {month: 'long', year: 'numeric'})
+          //- To use mixin use + and then just like a regular function.
+          +overviewBox('Next date', date, 'calendar')
+          +overviewBox('Difficulty', tour.difficulty, 'trending-up')
+          +overviewBox('Participants', `${tour.maxGroupSize} people`, 'user')
+          +overviewBox('Rating', `${tour.ratingsAverage} / 5`, 'star')
+
+        .overview-box__group
+          h2.heading-secondary.ma-bt-lg Your tour guides
+
+          each guide in tour.guides
+            .overview-box__detail
+              img.overview-box__img(src=`/img/users/${guide.photo}`, alt=`${guide.name}`)
+              //-using conditionals
+              - if (guide.role === 'lead-guide')
+                span.overview-box__label Lead guide
+              - if (guide.role === 'guide')
+                span.overview-box__label Tour guide
+              span.overview-box__text= guide.name
+
+    .description-box
+      h2.heading-secondary.ma-bt-lg= `About ${tour.name} tour`
+      - const parapraphs = tour.description.split('\n');
+      each p in parapraphs
+        p.description__text= p
+
+  section.section-pictures
+    each img, i in tour.images
+      .picture-box
+        img.picture-box__img(src=`/img/tours/${img}`, alt=`The Park Camper Tour ${i + 1}`, class=`picture-box__img--${i + 1}`)
+
+  //-Insted of using api call in mapbox.js embed location data into the HTML using data attributes for easy retrieval by JavaScript.
+  section.section-map
+    #map(data-locations=`${JSON.stringify(tour.locations)}`)
+    //-conversion of the array of locations into a string using 
+
+  section.section-reviews
+    .reviews
+      each review in tour.reviews
+        +reviewCard(review)
+
+  section.section-cta
+  .cta
+    .cta__img.cta__img--logo
+      img(src='/img/logo-white.png', alt='Natours logo')
+    img.cta__img.cta__img--1(src=`/img/tours/${tour.images[1]}`, alt='Tour picture')
+    img.cta__img.cta__img--2(src=`/img/tours/${tour.images[2]}`, alt='Tour picture')
+    .cta__content
+      h2.heading-secondary What are you waiting for?
+      p.cta__text= `${tour.duration} days. 1 adventure. Infinite memories. Make it yours today!`
+      if user
+        button.btn.btn--green.span-all-rows#book-tour(data-tour-id= `${tour.id}`) Book tour now!
+        //- (data-tour-id=${tour.id}): Adds a data attribute to store the tour ID.
+        //- data-tour-id: Name of the data attribute (converted to tourId in HTML). So whenever there is a dash it will automatically get converted to this camelcase notation.
+        //- ${tour.id}: Uses template interpolation to dynamically insert the value of the tour.id variable, likely a unique identifier for a specific tour.
+      else
+        a.btn.btn--green.span-all-rows(href='/login') Log in to book tour

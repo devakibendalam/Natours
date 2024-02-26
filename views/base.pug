@@ -1,0 +1,60 @@
+doctype html
+html
+  head
+    block head
+      meta(charset='UTF-8')
+      meta(name='viewport' content='width=device-width, initial-scale=1.0')
+      link(rel='stylesheet' href='/css/style.css')
+      link(rel='shortcut icon' type='image/png' href='/img/favicon.png')
+      link(rel='stylesheet' href='https://fonts.googleapis.com/css?family=Lato:300,300i,700')
+      title Natours | #{title}
+      //- Pug manages static assets like CSS and image files from a designated 'public' folder using Express middleware (express.static).
+    
+  body
+    // HEADER
+    include _header
+        
+    //- Child templates use 'block' tags with matching names to inject their content into these predefined sections.
+    // CONTENT
+    block content
+      h1 This is a placeholder heading
+      
+    // FOOTER
+    include _footer
+    
+    //- script(src='https://cdnjs.cloudflare.com/ajax/libs/axios/1.6.7/axios.min.js')
+    //- script(src='/js/mapbox.js')
+    //- script(src='/js/login.js')
+    script(src='https://js.stripe.com/v3/')
+    script(src='/js/bundle.js', defer)
+
+
+
+
+//- Purpose of Base Template:
+//- The base template acts as a foundational structure containing common HTML elements like 'head,' 'header,' and 'footer.'
+//- It lacks specific content for individual pages but serves as a starting point with a standardized layout.
+
+//- Child Pages' Content:
+//- Each specific page ('overview' and 'tour') only contains content relevant to that particular page.
+//- This content is injected into the base template using 'extend' to complete the layout.
+
+//- 'Extend' Functionality:
+//- 'Extend' allows child templates ('overview' and 'tour') to inherit the base layout's structure.
+//- Content from child templates is inserted into the designated sections of the base template ('block content').
+
+//- Child templates extends a base template using the 'extends' keyword followed by the base file's name.
+//- Enables child templates to inherit and modify sections of the base template.
+
+//- Block Content:
+//- Block Content: Allows defining sections in the base template where child templates can inject their content.
+//- In the base template, 'block' tags are placed with unique names (e.g., 'content').
+//- Child templates use 'block' tags with matching names to inject their content into these predefined sections.
+
+//- Parent-Child Relationship:
+//- the base is considered the parent, while 'header' and 'footer' are the children.
+//- The base layout 'includes' these children. However, with 'extends,' it's the children ('overview' and 'tour') that include the base.
+
+//- Block Content Understanding:
+//- Anything outside the 'block content' section in the base template gets copied into the child templates during 'extend.'
+//- So here the header & footer copied into overview and tour pages so that that can render entire page 
