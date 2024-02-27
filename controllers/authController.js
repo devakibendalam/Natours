@@ -15,21 +15,52 @@ const signToken = (id) => {
 // Cookies are small pieces of text sent by a server to clients and stored by browsers. They are automatically sent back with future requests to the same server.
 //Storing a JSON web token (JWT) in a secure HTTP-only cookie for improved security.
 
-const createSendToken = (user, statusCode, res) => {
+// Testing for Secure HTTPS Connections on Heroku
+// test for secure HTTPS connections in a Node.js application deployed on Heroku.
+// The createSentToken function sets an adjacent web cookie for a secure connection if the application is in production.
+
+// Issue with req.secure:
+// req.secure is a property in Express to check if the connection is secure, req.secure does not work as expected on Heroku due to its internal proxy that modifies incoming requests.
+
+// Alternative Solution for Heroku:
+// To address the Heroku-specific challenge, check for the x-forwarded-proto header.
+// If req.secure is true or the x-forwarded-proto header is set to HTTPS, the secure option for the cookie is set to true.
+
+// Heroku-Specific Header:
+// Heroku sets the x-forwarded-proto header to 'https' for secure connections.
+
+// Code Modification:
+// Refactoring is done to directly set the secure option based on the condition, simplifying the code.
+
+// Trusting Proxies in Express:
+// To enable the application to trust proxies, the app.enable('trust proxy') method is introduced in the app.js file.
+// Trusting proxies allows Express to correctly handle headers like x-forwarded-proto modified by Heroku.
+
+// Conclusion:
+// With these adjustments, the application can accurately determine whether the connection is secure, even when deployed on Heroku.
+
+const createSendToken = (user, statusCode, req, res) => {
   const token = signToken(user._id);
   // cookie options like expires to set expiration time, secure to enforce transmission over encrypted connections (HTTPS), and httpOnly to prevent browser access(modifying by browser), crucial for preventing cross-site scripting attacks.
-  const cookieOptions = {
+  // const cookieOptions = {
+  //   expires: new Date(
+  //     Date.now() + process.env.JWT_COOKIE_EXPIRES_IN * 24 * 60 * 60 * 1000,
+  //   ),
+  //   httpOnly: true,
+  //   secure: req.secure || req.headers['x-forwarded-proto'] === 'https',
+  // };
+
+  // secure only works for https so https available in production mode.
+  // if (process.env.NODE_ENV === 'production') cookieOptions.secure = true;
+
+  // Sending a cookie in the response object using res.cookie,  by specifying cookie name, token, and cookie options.
+  res.cookie('jwt', token, {
     expires: new Date(
       Date.now() + process.env.JWT_COOKIE_EXPIRES_IN * 24 * 60 * 60 * 1000,
     ),
     httpOnly: true,
-    // secure:false
-  };
-  // secure only works for https so https available in production mode.
-  if (process.env.NODE_ENV === 'production') cookieOptions.secure = true;
-
-  // Sending a cookie in the response object using res.cookie,  by specifying cookie name, token, and cookie options.
-  res.cookie('jwt', token, cookieOptions);
+    secure: req.secure || req.headers['x-forwarded-proto'] === 'https',
+  });
 
   // Remove password from output when creating new document(signup).
   user.password = undefined;
@@ -74,7 +105,7 @@ exports.signup = catchAsync(async (req, res, next) => {
   // console.log(url);
   await new Email(newUser, url).sendWelcome();
 
-  createSendToken(newUser, 201, res);
+  createSendToken(newUser, 201, req, res);
   // const token = signToken(newUser._id);
 
   // res.status(201).json({
@@ -105,7 +136,7 @@ exports.login = catchAsync(async (req, res, next) => {
   }
 
   // 3) If everything ok, send token to client
-  createSendToken(user, 200, res);
+  createSendToken(user, 200, req, res);
 });
 
 // HTTP-only cookies cannot be manipulated or deleted in the browse, Traditional JWT logout involves deleting the token from local storage. But with http only cookie its not possible.
@@ -309,7 +340,7 @@ exports.resetPassword = catchAsync(async (req, res, next) => {
 
   // 4) Log the user in, send JWT
   // Finalize the password reset by sending a new JSON Web Token to log in the user.
-  createSendToken(user, 200, res);
+  createSendToken(user, 200, req, res);
 });
 
 // logged-in users to update their passwords without resetting them.
@@ -330,5 +361,5 @@ exports.updatePassword = catchAsync(async (req, res) => {
   // User.findByIdAndUpdate will NOT work as intended! BCZ Mongoose does not really keep the current object(this) in memory. [In usermodel this is not work for update method it only works for save & create]. Don't use update for anything related to passwords.
 
   // 4) Log user in, send JWT
-  createSendToken(user, 200, res);
+  createSendToken(user, 200, req, res);
 });

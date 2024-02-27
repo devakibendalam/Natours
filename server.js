@@ -50,3 +50,22 @@ process.on('unhandledRejection', (err) => {
     process.exit(1);
   });
 });
+
+// 225 - Responding to a SIGTERM Signal
+// Heroku-specific configurations for handling a "sick term signal" that Heroku emits.
+// Dyno Restart Mechanism:
+// Heroku dynos, which are essentially containers running applications, restart every 24 hours to maintain the app's health.
+// Handling "Sick Term Signal":
+// Heroku sends a "sick term signal" to initiate the graceful shutdown of the application during dyno restarts.
+
+// Graceful Shutdown Implementation:
+// Implemented a graceful shutdown mechanism in the Node.js server using the process.on('SIGTERM', ...) event.
+
+// Avoiding Abrupt Shutdowns:
+// The graceful shutdown ensures that the server handles pending requests before shutting down, avoiding abrupt termination.
+process.on('SIGTERM', () => {
+  console.log('👋 SIGTERM RECEIVED. Shutting down gracefully');
+  server.close(() => {
+    console.log('💥 Process terminated!');
+  });
+});

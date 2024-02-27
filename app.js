@@ -17,11 +17,14 @@ const userRouter = require('./routes/userRoutes');
 const reviewRouter = require('./routes/reviewRouter');
 const viewRouter = require('./routes/viewRoutes');
 const bookingRouter = require('./routes/bookingRoutes');
-// const cors = require('cors');
+const cors = require('cors');
 
 // Create an instance of Express
 //Assign result of calling express -> express is the function here which upon calling will add a bunch of methods to our app variable here
 const app = express();
+
+//Trusting proxies allows Express to correctly handle headers like x-forwarded-proto modified by Heroku.
+app.enable('trust proxy');
 
 // const corsOption = {
 //   origin: true,
@@ -38,6 +41,82 @@ app.set('views', path.join(__dirname, 'views'));
 // behind the scences path module will create a path joining the dirname/views
 
 // 1) GLOBAL MIDDLEWARES
+
+// Introduction to CORS:
+// CORS stands for Cross-Origin Resource Sharing.
+// It's a crucial feature for APIs allowing secure access from different domains.
+// Cross-origin requests occur when a client from one domain tries to access an API on a different domain.
+
+// Default Restrictions:
+// Cross-origin requests are usually not allowed for security reasons.
+// Without CORS implementation, these requests would fail by default.
+
+// Example Scenario:
+// Consider an API at natours-jonas.herokuapp.com/api/v1.
+// Another website, e.g., example.com, attempts to access this API.
+// This is a cross-origin request and, by default, would be blocked.
+
+// CORS Implementation:
+// CORS is implemented to allow cross-origin requests explicitly.
+// It's crucial when making the API available to different websites.
+
+// Browser Restrictions:
+// CORS restrictions apply to requests made from the browser, not the server.
+// Cross-origin includes different domains, subdomains, protocols, and ports.
+
+// Native JavaScript Fetch Function:
+// Fetch is a function similar to axios library but its native JavaScript in browser.
+// Attempting a request  using the fetch function to the API in the browser console resulted in a CORS policy error.
+
+// CORS Middleware with Node.js and Express:
+// Installed the CORS package using npm install cors.
+// Implemented CORS middleware in the Express application using app.use(cors()).
+// Middleware added globally to allow CORS for all incoming requests.
+
+// Configuring CORS Options:
+// CORS can be configured to allow requests only from specific origins.
+// Example: app.use(cors({ origin: 'https://www.natours.com' })).
+
+// Implemeting CORS
+// This enabling CORS for all incoming requests means for our entire API
+app.use(cors()); // intern will return a middleware function which is then gonna add a couple of different headers to our response.  means that the cors() middleware, when applied, returns a function that acts as middleware. This function, when executed during an incoming request, will modify the response headers by adding specific CORS-related headers, facilitating Cross-Origin Resource Sharing for the API.
+
+// We can also enable cors on a specific route. then need to add that into middleware stack like this
+// app.use('/api/v1/tours' cors(), tourRouter);
+
+// Default CORS Header (Access-Control-Allow-Origin*):
+// The default implementation sets the Access-Control-Allow-Origin header to allow requests from any origin using the wildcard symbol *, meaning all domains are permitted.
+
+// Allowing Specific Origins:
+// In some cases, you may want to restrict API access to specific domains or subdomains while denying others.
+// Example: API hosted at API.natours.com, front-end app at natours.com.
+// Then use this configuration : an object is passed with options, specifying the allowed origin.
+// app.use(cors({ origin: 'https://www.natours.com' }));
+
+// Handling Simple and Non-Simple Requests in CORS:
+// Simple Requests (GET and POST):
+// Simple requests like GET and POST are handled by the default CORS setup.
+// The Access-Control-Allow-Origin header is set to allow requests from any origin using the wildcard symbol *.
+
+// Non-Simple Requests (PUT, PATCH, DELETE, or with Cookies/Nonstandard Headers):
+// Non-simple requests require a preflight phase to determine if the actual request is safe to send.
+// The browser automatically issues an OPTIONS request before the actual request.
+// The server must respond to the OPTIONS request with the appropriate CORS headers.
+
+// Preflight Phase and CORS Middleware:
+// Developers need to respond to the OPTIONS request on the server.
+// Define an OPTIONS route and send back the Access-Control-Allow-Origin header.
+app.options('*', cors()); // Handles preflight phase for all routes
+// Optional: Restrict Preflight Handling to Specific Routes:
+// Preflight handling can be limited to specific routes using app.options.
+// Example: app.options('api/v1/tours/:id', cors());
+// This ensures that complex requests (PUT, PATCH, DELETE) are only allowed for the specified route.
+
+// Understanding app.options:
+// app.options is an HTTP method, not for setting application options.
+// Used to define how the server responds to OPTIONS requests.
+// In this case, it's utilized to handle the CORS preflight phase.
+
 // Serving static files
 // express.static is a built-in middleware function in Express. It's responsible for serving static files, such as HTML, images, CSS, JavaScript, etc., to the client.
 app.use(express.static(path.join(__dirname, 'public'))); //Once this middleware is set up, any files present in the 'public' directory (such as HTML, images, CSS, or JavaScript files) can be accessed directly via the browser without the need to define specific routes for each file. like this (http://localhost:3000/overview.html)
